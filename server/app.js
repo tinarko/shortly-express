@@ -87,21 +87,24 @@ function(req, res, next) {
 /************************************************************/
 
 app.post('/signup', 
-function(req, res, next) {
-  // receive new user record
-  var username = req.body.username;
-  var password = req.body.password;
+  function(req, res, next) {
+    // receive new user record
+    var username = req.body.username;
+    var password = req.body.password;
 
-  // insert into users table
-  var params = [username, password];
-  Users.createUser(params, function (err, data) {
-    if (err) {
-      throw err;
-    }
-  });
-
-
-});
+    // insert into users table
+    var params = [username, password];
+    Users.createUser(params, function (err, data) {
+      if (err) {
+        console.log('err', err);
+        res.redirect('/signup');
+      }
+      console.log('hi');
+      res.redirect('/');
+      
+    });
+  }
+);
 
 
 /************************************************************/
