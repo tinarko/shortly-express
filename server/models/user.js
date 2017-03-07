@@ -5,23 +5,63 @@ var utils = require('../lib/utility');
 
 module.exports = {
   createUser: function(params, callback) {
-
+    
+    // ATTEMPT PROMISIFY
+    // db.queryAsync('SELECT username FROM users where username = ?', params[0])
+    // .then(function(results) {
+    //   if (results.length === 0) {
+    //     var cookie = utils.hashPassword(params[1]);
+    //     var salt = cookie.salt;
+    //     var passwordHash = cookie.passwordHash;
+    //   }
+    // })
+    
     db.query('SELECT username FROM users where username = ?', params[0], function(error, results, fields) {
       if (results.length === 0) {
         var cookie = utils.hashPassword(params[1]);
         var salt = cookie.salt;
         var passwordHash = cookie.passwordHash;
-        db.query('INSERT INTO users (username, password, salt) VALUES (?,?,?)', [params[0], passwordHash, salt], function(err, result) {
-          callback(null, result);
-        });
+        db.query('INSERT INTO users (username, password, salt) VALUES (?,?,?)', [params[0], passwordHash, salt], 
+          function(err, result) {
+            callback(null, result);
+          }
+        );
       } else {
-        var error = new Error('user already exists');
+        var error = new Error('User already exists');
         callback(error, null);
       }
+    });
+   
+  },
+
+  validateUser: function(params, callback) {
+    //validate the user is already in database
+    // if not, direct to login page
+    // if yes,  retrieve salt from db and hash(password), check hashedPassword
+    //          if hashedPassword is incorrect, direct to login page
+    //          else create a session 
+    db.query('SELECT username, salt, password FROM users where username = ?', params[0], function(error, results, fields) {
+      if (results.length === 0) {
+        var error = new Error('User does not exist, please sign up');
+        callback(error, null);
+      } else {
+        var salt = results[0].salt;
+        var password = params[1]; //user entered password plaintext
+        var hashedPassword = utils.hashPassword(password, salt); // 
+        if (hashedPassword.passwordHash === results[0].password) {
+          callback(null, results);
+
+        } else {
+          var error = new Error('Password incorrect, try again');
+          callback(error, null);
+        }
+
+
+      }
+
+
 
     });
 
-    // db.queryAsync for when we use promisify
-   
   }
 };

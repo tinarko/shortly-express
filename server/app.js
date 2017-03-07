@@ -98,10 +98,27 @@ app.post('/signup',
       if (err) {
         console.log('err', err);
         res.redirect('/signup');
+      } else {
+        res.redirect('/');
       }
-      console.log('hi');
-      res.redirect('/');
-      
+    });
+  }
+);
+
+app.post('/login', 
+  function(req, res, next) {
+    // receive new user record
+    var username = req.body.username;
+    var password = req.body.password;
+
+    // insert into users table
+    var params = [username, password];
+    Users.validateUser(params, function (err, data) {
+      if (err) {
+        res.redirect('/login');
+      } else {
+        res.redirect('/');
+      }
     });
   }
 );

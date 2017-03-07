@@ -20,8 +20,8 @@ exports.isValidUrl = function(url) {
 /************************************************************/
 // Add additional utility functions below
 /************************************************************/
-exports.hashPassword = function(password) {
-  var salt = crypto.randomBytes(6).toString('hex');
+exports.hashPassword = function(password, salt) {
+  salt = salt || crypto.randomBytes(6).toString('hex');
   var hash = crypto.createHmac('md5WithRSAEncryption', salt);
   hash.update(password);
   var value = hash.digest('hex');
@@ -30,8 +30,4 @@ exports.hashPassword = function(password) {
     salt: salt,
     passwordHash: value
   };
-
-  
-
-
 };
