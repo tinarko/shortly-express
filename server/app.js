@@ -86,6 +86,22 @@ function(req, res, next) {
 // Write your authentication routes here
 /************************************************************/
 
+app.post('/signup', 
+function(req, res, next) {
+  // receive new user record
+  var username = req.body.username;
+  var password = req.body.password;
+
+  // insert into users table
+  var params = [username, password];
+  Users.createUser(params, function (err, data) {
+    if (err) {
+      throw err;
+    }
+  });
+
+
+});
 
 
 /************************************************************/
