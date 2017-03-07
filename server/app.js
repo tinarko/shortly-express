@@ -8,6 +8,8 @@ var Users = require('./models/user');
 var Links = require('./models/link');
 var Sessions = require('./models/session');
 var Click = require('./models/click');
+var parseCookies = require('./middleware/cookieParser');
+var createSession = require('./middleware/sessionParser');
 
 var app = express();
 
@@ -20,6 +22,10 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 // Serve static files from ../public directory
 app.use(express.static(path.join(__dirname, '../public')));
+// Parse cookies
+app.use(parseCookies);
+// Parse session
+app.use(createSession);
 
 app.get('/', 
 function(req, res) {
