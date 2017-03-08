@@ -98,16 +98,24 @@ app.post('/signup',
     var username = req.body.username;
     var password = req.body.password;
 
-    // insert into users table
-    var params = [username, password];
-    Users.createUser(params, function (err, data) {
-      if (err) {
-        console.log('err', err);
+    Users.findUser(username)
+    .then(function(queryResult) {
+      // if user exists
+      if (queryResult[0].length !== 0) {
+        //redirect to signup page
         res.redirect('/signup');
+      // if user does not exist
       } else {
+        // create a user and store username, password into database
+        Users.createUser(username, password);
+        // redirect to index
         res.redirect('/');
       }
+    })
+    .catch(function(err) {
+      throw err;
     });
+
   }
 );
 

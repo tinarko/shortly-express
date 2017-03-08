@@ -31,3 +31,9 @@ exports.hashPassword = function(password, salt) {
     passwordHash: value
   };
 };
+
+exports.sessionIdGenerator = function() {
+  var sha = crypto.createHash('sha256');
+  sha.update(Math.random().toString());
+  return sha.digest('hex');
+};

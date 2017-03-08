@@ -4,33 +4,39 @@ var utils = require('../lib/utility');
 // Write you user database model methods here
 
 module.exports = {
-  createUser: function(params, callback) {
+  findUser: function(username) {
+    var queryStr = 'SELECT username FROM users where username = ?';
+    return db.queryAsync(queryStr, username);
+  },
+
+
+  createUser: function(username, password) {
     
-    // ATTEMPT PROMISIFY
-    // db.queryAsync('SELECT username FROM users where username = ?', params[0])
-    // .then(function(results) {
+    // Promisified code. Beautiful!
+    var cookie = utils.hashPassword(password);
+    var salt = cookie.salt;
+    var passwordHash = cookie.passwordHash;
+    //creating user in database
+    return db.queryAsync('INSERT INTO users (username, password, salt) VALUES (?,?,?)', [username, passwordHash, salt]);
+
+
+    // NOT promisified code... LOL!!!
+
+    // db.query('SELECT username FROM users where username = ?', params[0], function(error, results, fields) {
     //   if (results.length === 0) {
     //     var cookie = utils.hashPassword(params[1]);
     //     var salt = cookie.salt;
     //     var passwordHash = cookie.passwordHash;
+    //     db.query('INSERT INTO users (username, password, salt) VALUES (?,?,?)', [params[0], passwordHash, salt], 
+    //       function(err, result) {
+    //         callback(null, result);
+    //       }
+    //     );
+    //   } else {
+    //     var error = new Error('User already exists');
+    //     callback(error, null);
     //   }
-    // })
-    
-    db.query('SELECT username FROM users where username = ?', params[0], function(error, results, fields) {
-      if (results.length === 0) {
-        var cookie = utils.hashPassword(params[1]);
-        var salt = cookie.salt;
-        var passwordHash = cookie.passwordHash;
-        db.query('INSERT INTO users (username, password, salt) VALUES (?,?,?)', [params[0], passwordHash, salt], 
-          function(err, result) {
-            callback(null, result);
-          }
-        );
-      } else {
-        var error = new Error('User already exists');
-        callback(error, null);
-      }
-    });
+    // });
    
   },
 
@@ -55,12 +61,7 @@ module.exports = {
           var error = new Error('Password incorrect, try again');
           callback(error, null);
         }
-
-
       }
-
-
-
     });
 
   }
